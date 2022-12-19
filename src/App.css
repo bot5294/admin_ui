@@ -81,3 +81,6 @@
 .page-item:first-child .page-link {
   border-radius: 50% !important;
 }
+.highlight-row{
+  background-color: lightgrey;
+}

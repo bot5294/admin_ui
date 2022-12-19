@@ -224,7 +224,16 @@ export default function Layout(props) {
       }else{
         tr.classList.add('highlight-row');
       }
-
+    }
+    const handleSearch=(event)=>{
+      let txt = event.target.value.toLowerCase();
+      let allItems = [...props.data];
+      allItems = allItems.filter((item)=>{
+        console.log(typeof item.name);
+        return item.name.toLowerCase().includes(txt) || item.email.toLowerCase().includes(txt) || item.role.toLowerCase().includes(txt);
+      })
+      console.log("serched items >> ",allItems);
+      setCurrentItems(allItems)
     }
     return (
       <>
@@ -232,9 +241,14 @@ export default function Layout(props) {
           type="text"
           placeholder="Search by name, email or role"
           style={mystyle}
+          onKeyDown={(e)=>{
+            if(e.key=="Enter"){
+              handleSearch(e);
+            }
+          }}
         ></input>
         <div>
-        {showEdit!=null && props.data.map((data) => {
+        {showEdit!=null && props.data.map((data,index) => {
           {console.log("******* = "+data.id+" "+showEdit)}
           if(data.id===showEdit){
                     return <>
@@ -248,7 +262,7 @@ export default function Layout(props) {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr key={index}>
 
                   <td><input type="text" placeholder={data.name} id={"edit-name"} /></td>
                   <td><input type="text" placeholder={data.email} id={"edit-email"} /></td>
@@ -294,9 +308,9 @@ export default function Layout(props) {
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((data) => {
+            {currentItems.map((data,index) => {
               return <>
-                  <tr id={`tr-${data.id}`}>
+                  <tr id={`tr-${data.id}`} key={index}>
       <td>
         <input type="checkbox" id={`chk-${data.id}`} value={data.id} className="multi-checkboxes" onClick={()=>handleToggleClass(`tr-${data.id}`)} />
       </td>

@@ -11,6 +11,7 @@ export default function Layout(props) {
   // let { data, setData } = props;
   let [currentItems, setCurrentItems] = useState([]);
   let [showEdit,setShowEdit] = useState(null);
+  const [reload,setReload] = useState(false);
   let deleteItems = [];
   const mystyle = {
     width: "90%",
@@ -22,59 +23,24 @@ export default function Layout(props) {
   }, [props.data]);
   useEffect(()=>{
 
-  },[currentItems])
+  },[currentItems,reload])
 
   function PaginatedItems({ itemsPerPage }) {
-    // if(itemsPerPage=="Edit"){
-    //   let allItems = [...currentItems];
-    //   allItems = allItems.filter((val)=>val.id===showEdit);
-    //   return (
-    //     <>
-    //       <Items currentItems={allItems}  />
-    //       {/* <Container fluid>
-    //         <Row className="d-flex justify-content-center">
-    //           <Col md={2}>
-    //             <Button
-    //               className="btn-danger"
-    //               onClick={() => handleMultipleDelete()}
-    //             >
-    //               Delete Selected
-    //             </Button>
-    //           </Col>
-    //           <Col md={10} className="align-self-center">
-    //             <ReactPaginate
-    //               nextLabel=">"
-    //               onPageChange={handlePageClick}
-    //               pageRangeDisplayed={5}
-    //               marginPagesDisplayed={2}
-    //               pageCount={pageCount}
-    //               previousLabel="<"
-    //               pageClassName={"page-item"}
-    //               pageLinkClassName={"page-link"}
-    //               previousClassName={"page-item"}
-    //               previousLinkClassName={"page-link"}
-    //               nextClassName={"page-item"}
-    //               nextLinkClassName={"page-link"}
-    //               breakLabel="..."
-    //               breakClassName={"page-item"}
-    //               breakLinkClassName={"page-link"}
-    //               containerClassName={"pagination"}
-    //               activeClassName={"active"}
-    //               renderOnZeroPageCount={null}
-    //             />
-    //           </Col>
-    //         </Row>
-    //       </Container> */}
-    //     </>
-    //   );
-    // }else{
-      const [itemOffset, setItemOffset] = useState(0);
+    const [itemOffset, setItemOffset] = useState(0);
     const endOffset = itemOffset + itemsPerPage;
     console.log("currentData >> ",currentItems);
     console.log(`Loading items from ${itemOffset} to ${endOffset}`);
     let CurrentItems = currentItems.slice(itemOffset, endOffset);
     const pageCount = Math.ceil(currentItems.length / itemsPerPage);
+
     const handlePageClick = (event) => {
+      console.log("hpc : >> ",event);
+      // let li = document.getElementsByClassName("page-item");
+      // for(const item of li){
+      //   if(item.classList.contains('active')){
+      //     item.classList.remove('active');
+      //   }
+      // }
       let as = document.getElementById("all-select");
       as.checked = false;
       const newOffset = (event.selected * itemsPerPage) % currentItems.length;
@@ -98,11 +64,36 @@ export default function Layout(props) {
       console.log("allItems >> ",allItems);
       setCurrentItems(allItems);
     };
+    const handleFirstPage=()=>{
+      setReload(!reload)
+    }
+    const handleLastPage=()=>{
+      let count = Math.ceil(currentItems.length/itemsPerPage);
+      console.log(count);
+      let li = document.getElementsByClassName("page-item");
+      for(const item of li){
+        if(item.classList.contains('active')){
+          item.classList.remove('active');
+        }
+      }
+      li[count].classList.add('active');
+      let ul = document.getElementsByClassName('pagination')[0];
+      console.log(ul);
+      let lastChild = ul.children[ul.children.length-1];
+      console.log(lastChild);
+      lastChild.classList.add('disabled')
+      // if(li[count+1]){
+      //   li[count+1].classList.add('active');
+      // }else{
+      //   li[count].classList.add('active');
+      // }
+      handlePageClick({selected:count-1})
+    }
     return (
       <>
         <Items currentItems={CurrentItems} />
         <Container fluid>
-          <Row className="d-flex justify-content-center">
+          <Row className="d-flex">
             <Col md={2}>
               {
               showEdit==null?
@@ -121,7 +112,10 @@ export default function Layout(props) {
               </Button>
               }
             </Col>
-            <Col md={10} className="align-self-center">
+            <Col md={4} className="align-self-center">
+            <Row className="d-flex justify-content-center align-items-baseline">
+              <Col md={1} sm={12}><img src={"https://cdn-icons-png.flaticon.com/512/70/70229.png"} width={"25px"} onClick={()=>handleFirstPage()}/></Col>
+              <Col md={10} sm={12}>
               <ReactPaginate
                 nextLabel=">"
                 onPageChange={handlePageClick}
@@ -142,12 +136,14 @@ export default function Layout(props) {
                 activeClassName={"active"}
                 renderOnZeroPageCount={null}
               />
+              </Col>
+              <Col md={1} sm={12}><img src={"https://cdn-icons-png.flaticon.com/512/70/70082.png"} width={"25px"} onClick={()=>handleLastPage()}/></Col>
+              </Row>
             </Col>
           </Row>
         </Container>
       </>
     );
-    // }
   }
 
   function Items({ currentItems }) {
@@ -172,8 +168,6 @@ export default function Layout(props) {
         tr.classList.add('highlight-row');
       });
       deleteItems = [...currentItems];
-      // setDeleteItems(currentItems);
-      // setCurrentItems(currentItems);
       console.log(currentItems);
     };
 
@@ -326,7 +320,6 @@ export default function Layout(props) {
       </td>
     </tr>
               </>
-              // return <Tile data={e} key={e.id} setCurrentItems={setCurrentItems} currentItems={currentItems} />;
             })}
           </tbody>
         </Table>

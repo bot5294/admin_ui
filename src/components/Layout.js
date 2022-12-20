@@ -245,7 +245,7 @@ export default function Layout(props) {
         ></input>
         <div>
           {showEdit != null &&
-            props.data.forEach((data, index) => {
+            props.data.map((data, index) => {
               if (data.id === showEdit) {
                 return (
                   <>
